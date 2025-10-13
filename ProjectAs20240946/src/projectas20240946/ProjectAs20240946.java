@@ -6,8 +6,6 @@ package projectas20240946;
 
 import java.util.Scanner;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
-
 /**
  *
  * @author Kalana Dasanayaka
@@ -16,11 +14,12 @@ public class ProjectAs20240946 {
 
    
     public static void main(String[] args) {
+        final int MAX_CITIES = 30;
+
         int indexCities = 0  ;
-        String cities[] = new String[30];
-        System.out.println(cities[indexCities]);
-        int a = openIndex(cities);
-        System.out.println(a);
+        String cities[] = new String[MAX_CITIES];
+        double distanceTable[][] = new double[MAX_CITIES][MAX_CITIES];
+
     }
     public static void menu(String[] array, int index){ 
         int choice = 0; 
@@ -28,11 +27,9 @@ public class ProjectAs20240946 {
             
         
         System.out.print("Menu Option : ");
-        Scanner input = new Scanner(System.in);
-        choice = input.nextInt();
         switch (choice) {
             case 1:
-                addCity(array, index);
+                index = addCity(array, index);
                 break;
             case 2:
                 break;
@@ -44,8 +41,67 @@ public class ProjectAs20240946 {
 
     }
     }
-    public static int addCity(String[] array){
-        int index;
+    public static int getCityIndex(String [] array,String name){
+        int index = -99;
+        for(int i = 0; i < 30 ; i++){
+            if(array[i]!=null){
+                if(name.toLowerCase() == array[i].toLowerCase()){
+                index = i;
+                }
+            }
+         }
+         return(index);
+    }
+    public static void updateDistance(String[] city,double[][] distance){
+        int start = -1;
+        int end = -1;
+        int exit = -1;
+        while(exit != -99){
+            System.out.print("Departure :  ");
+            Scanner input = new Scanner(System.in);
+            String cityName =  input.nextLine();
+            start = getCityIndex(city, cityName);
+            if(start == -99){
+                System.out.println("Wrong City Name Entered !!!");
+                System.out.println("Try Again!!!");
+                continue;
+            }
+            while(exit != -99){
+                System.out.print("Destination : ");
+                cityName = input.nextLine();
+                end = getCityIndex(city, cityName);
+                if(end == -99){
+                    System.out.println("Wrong City Name Entered !!!");
+                    System.out.println("Try Again!!!");
+                    continue;
+                }
+                System.out.print("what is the distance between "+city[start]+" and "+city[end]+" (km) : ");
+                double distance = input.nextDouble();
+                distance[start][end]= distance ;
+                distance[start][end] = distance[end][start];
+                System.out.println("To exit press \"-99\" ");
+                exit = input.nextInt();
+
+
+    
+    
+    }
+        
+
+        
+            
+         
+
+
+
+        }
+    }
+
+
+
+
+    public static int addCity(String[] array,int index){
+       
         System.out.println("What is the name of the city ? ");
         Scanner input = new Scanner(System.in);
         String cityName=input.nextLine();
@@ -61,7 +117,7 @@ public class ProjectAs20240946 {
         for (int i = 0; i < 30; i++) {
             if( array[i] == null || array[i].isEmpty()){
                 return openIndex;
-            }
+}
         }
         return(-1);
     
