@@ -65,56 +65,56 @@ public class ProjectAs20240946 {
          }
          return(index);
     }
-    public static void updateDistance(String[] city,double[][] distance){
-        int start = -1;
-        int end = -1;
-        String exit = "not exit";
-        while(!exit.equals("exit")){
-            System.out.print("Departure :  ");
-            Scanner input = new Scanner(System.in);
-            String cityName =  input.nextLine();
-            if(cityName.toLowerCase().equals("exit")){
+public static void updateDistance(String[] city, double[][] distance) {
+    int start = -1;
+    int end = -1;
+    Scanner input = new Scanner(System.in);
+    String exit = "not exit";
+
+    while (!exit.equals("exit")) {
+        System.out.print("Departure :  ");
+        String cityName = input.nextLine();
+        if (cityName.equalsIgnoreCase("exit")) {
+            break;
+        }
+
+        start = getCityIndex(city, cityName);
+        if (start == -99) {
+            System.out.println("Wrong City Name Entered !!!");
+            System.out.println("Try Again!!!");
+            System.out.println("(To exit the sequence type, exit)");
+            continue;
+        }
+
+        while (!exit.equals("exit")) {
+            System.out.print("Destination : ");
+            cityName = input.nextLine();
+            if (cityName.equalsIgnoreCase("exit")) {
+                exit = "exit";
                 break;
             }
-            start = getCityIndex(city, cityName);
-            if(start == -99){
+
+            end = getCityIndex(city, cityName);
+            if (end == -99) {
                 System.out.println("Wrong City Name Entered !!!");
                 System.out.println("Try Again!!!");
-                System.out.println("(To exit the sequence type, exit)");
                 continue;
             }
-            while(!exit.equals("exit")){
-                System.out.print("Destination : ");
-                cityName = input.nextLine();
-                end = getCityIndex(city, cityName);
-                if(end == -99){
-                    System.out.println("Wrong City Name Entered !!!");
-                    System.out.println("Try Again!!!");
-                    continue;
-                }
-                System.out.print("what is the distance between "+city[start]+" and "+city[end]+" (km) : ");
-                double distance1 = input.nextDouble();
-                distance[start][end]= distance1 ;
-                distance[start][end] = distance[end][start];
-                System.out.println("To exit type \"exit\" ");
-                System.out.println("If you want to continue updating the distances, type next.");
-                Scanner sc = new Scanner(System.in);
-                exit = sc.nextLine();
 
+            System.out.print("What is the distance between " + city[start] + " and " + city[end] + " (km): ");
+            double distance1 = input.nextDouble();
+            input.nextLine(); // <-- consume the leftover newline
+            distance[start][end] = distance1;
+            distance[end][start] = distance1;
 
-    
-    
-    }
-        
-
-        
-            
-         
-
-
-
+            System.out.print("Type 'exit' to stop or press 'Enter' to continue: ");
+            exit = input.nextLine();
         }
     }
+
+ 
+}
+
 
 
 
