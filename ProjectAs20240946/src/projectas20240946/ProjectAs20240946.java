@@ -16,6 +16,36 @@ public class ProjectAs20240946 {
     public static void main(String[] args) {
         final int MAX_CITIES = 30;
 
+
+        final double[][] VEHICLE_TABLE =  new double[5][5];
+        /*  VEHICLE_TABLE[0][] = VAN
+            VHEICALE_TABLE[1][] = TRUCK
+            VEHICLE_TABLE[2][] = LORRY
+         
+         * VEHICLE_TABLE[][0] = CAPACITY (KG)
+         * VEHICLE_TABLE[][1] = RATE PER KM (LKR)
+         * VEHICLE_TABLE[][2] = AVERAGE SPEED (KM per HOUR)
+         * VEHICLE_TABLE[][3] = FUEL EFFICIENCY (KM per LITER)
+         
+        */
+        //VAN
+        VEHICLE_TABLE[0][0] = 1000;
+        VEHICLE_TABLE[0][1] = 30;
+        VEHICLE_TABLE[0][2] = 60;
+        VEHICLE_TABLE[0][3] = 12;
+
+        //TRUCK
+        VEHICLE_TABLE[1][0] = 5000;
+        VEHICLE_TABLE[1][1] = 40;
+        VEHICLE_TABLE[1][2] = 50;
+        VEHICLE_TABLE[1][3] = 6;
+
+        //LORRY
+        VEHICLE_TABLE[2][0] = 10000;
+        VEHICLE_TABLE[2][1] = 80;
+        VEHICLE_TABLE[2][2] = 45;
+        VEHICLE_TABLE[2][3] = 4;;
+
         int indexCities = 0  ;
         String cities[] = new String[MAX_CITIES];
         double distanceTable[][] = new double[MAX_CITIES][MAX_CITIES];
@@ -27,11 +57,12 @@ public class ProjectAs20240946 {
         cities[2]="kottawa";
         cities[4]="nugegoda";
         cities[5]="kirulapone";
-        
+        renameCity(cities);
+        System.out.println(cities[0]);
                 
         
         
-        updateDistance(cities, distanceTable);
+        
 
     }
     public static void menu(String[] array, int index){ 
@@ -58,7 +89,7 @@ public class ProjectAs20240946 {
         int index = -99;
         for(int i = 0; i < 30 ; i++){
             if(array[i]!=null){
-                if(name.toLowerCase().equals(array[i].toLowerCase()) ){
+                if(name.equalsIgnoreCase(array[i])) {
                 index = i;
                 }
             }
@@ -114,7 +145,7 @@ public static void updateDistance(String[] city, double[][] distance) {
 
  
 }
-
+ 
 
 
 
@@ -124,7 +155,7 @@ public static void updateDistance(String[] city, double[][] distance) {
         System.out.println("What is the name of the city ? ");
         Scanner input = new Scanner(System.in);
         String cityName=input.nextLine();
-        array[index]=cityName;
+        array[index]=cityName.toUpperCase();
         index=index+1;
         input.close();
         return(index);
@@ -143,4 +174,36 @@ public static void updateDistance(String[] city, double[][] distance) {
     
     
     }
+
+  
+public static void renameCity(String[] array){
+    Scanner input = new Scanner(System.in); 
+    System.out.println("What is the city you need to rename ? ");
+    String city = input.nextLine();
+    int index = getCityIndex(array, city);
+
+    if (index == -99) {
+        System.out.println("Wrong City Name Entered !!!");
+        System.out.println("Try Again!!!");
+        return;
+        
+    }
+
+    System.out.println("What do you need to rename the city as ? ");
+    String renamedCity = input.nextLine();
+    array[index] = renamedCity.toUpperCase();
+}
+
+    
+    public static void removeCity(String[] array){
+        System.out.println("What city do you need removed ? ");
+        Scanner input = new Scanner(System.in);
+        String city = input.nextLine();
+        int index = getCityIndex(array, city);
+        array[index] = "";
+        input.close();
+    }
+
+    
+
 }
