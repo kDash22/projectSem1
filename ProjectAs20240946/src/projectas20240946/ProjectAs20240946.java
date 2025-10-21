@@ -11,7 +11,7 @@ import java.util.Scanner;
  * @author Kalana Dasanayaka
  */
 public class ProjectAs20240946 {
-
+    static final double FUEL_PRICE = 310;
    
     public static void main(String[] args) {
         final int MAX_CITIES = 30;
@@ -49,7 +49,16 @@ public class ProjectAs20240946 {
         int indexCities = 0  ;
         String cities[] = new String[MAX_CITIES];
         double distanceTable[][] = new double[MAX_CITIES][MAX_CITIES];
-        
+        double orderTable[] = new double[6];
+        /* distance =       orderTable[0]
+         * weight =         orderTable[1]
+         * Rate per km =    orderTable[2]
+         * Vehicle speed =  orderTable[3]
+         * efficiency =     orderTable[4]
+         * fuel price =     orderTable[5]
+         */
+
+
         //for testing purposes
         cities[0]="colombo";
         cities[1]="homagama";
@@ -204,6 +213,110 @@ public static void renameCity(String[] array){
         input.close();
     }
 
-    
+    public static void addOder(String[] citiyTable, double[][] distanceTable, double[][] vehicleTable, double[] orderTable){
+        double cargo;
+        int vehicleIndex ;
+
+        Scanner input = new Scanner(System.in);
+        
+        System.out.println("What is the source city name ? ");
+        String source = input.nextLine();
+        int sourceIndex = getCityIndex(citiyTable, source);
+        System.out.println("What is the destination city name ? ");
+        String destination = input.nextLine();
+        int destinationIndex = getCityIndex(citiyTable, destination);
+        if (source == destination) {
+            System.out.println("Souce city and Destination city cannot be the same .");
+            System.out.println("Invalid input. please try again !!!");
+            return;
+            
+        }
+        while (true) {
+            System.out.println("How much cargo do you want to transpot ? (in kg) ");
+            cargo = input.nextDouble();
+            System.out.println("What is your prefered vehicle type ? (1 = Van, 2 = Truck, 3 = Lorry)" );
+            vehicleIndex = input.nextInt()-1;
+            if (vehicleTable[vehicleIndex][0] < cargo ) {
+                System.out.println("Your prefered vehicle doesn't allow your required cargo weight.");
+                System.out.println("Invalid input. please try again !!!");
+                continue;
+                }
+                break;
+    }
+        /* distance =       orderTable[0] 
+         * weight =         orderTable[1]
+         * Rate per km =    orderTable[2]
+         * Vehicle speed =  orderTable[3]
+         * efficiency =     orderTable[4]
+         * fuel price =     orderTable[5]
+         */
+        /*  VEHICLE_TABLE[0][] = VAN
+            VHEICALE_TABLE[1][] = TRUCK
+            VEHICLE_TABLE[2][] = LORRY
+         
+         * VEHICLE_TABLE[][0] = CAPACITY (KG)
+         * VEHICLE_TABLE[][1] = RATE PER KM (LKR)
+         * VEHICLE_TABLE[][2] = AVERAGE SPEED (KM per HOUR)
+         * VEHICLE_TABLE[][3] = FUEL EFFICIENCY (KM per LITER)
+         
+        */
+        
+        orderTable[0] = distanceTable[sourceIndex][destinationIndex];
+        orderTable[1] = cargo;
+        orderTable[2] = vehicleTable[vehicleIndex ][1];
+        orderTable[3] = vehicleTable[vehicleIndex ][2];
+        orderTable[4] = vehicleTable[vehicleIndex ][3];
+        orderTable[5] = FUEL_PRICE;
+    }
+    public static double deliveryCost(double[] orderTable){
+        /* distance =       orderTable[0]
+         * weight =         orderTable[1]
+         * Rate per km =    orderTable[2]
+         * Vehicle speed =  orderTable[3]
+         * efficiency =     orderTable[4]
+         * fuel price =     orderTable[5]
+         */
+        
+        double cost = orderTable[0] * orderTable[2] * (1+ orderTable[1]*1/10000);
+        return(cost);
+    }
+    public static double estimatedDeliveryTime(double[] orderTable){
+        double time = orderTable[0] / orderTable[3];
+        return(time);
+    }
+
+    public static double fuelConsumption(double[] orderTable){
+         /* distance =       orderTable[0]
+         * weight =         orderTable[1]
+         * Rate per km =    orderTable[2]
+         * Vehicle speed =  orderTable[3]
+         * efficiency =     orderTable[4]
+         * fuel price =     orderTable[5]
+         */
+        
+        double fuelUsed = orderTable[0] / orderTable[4];
+        return fuelUsed;
+    }
+
+    public static double fuelCost(double[] orderTable){
+        double fuelCost = fuelConsumption(orderTable) * FUEL_PRICE;
+        return fuelCost;
+    }
+
+    public static double TotalOperationCost(double[] orderTable){
+        double totalCost = deliveryCost(orderTable) + fuelCost(orderTable);
+        return totalCost;
+
+    }
+    public static double profit(double[] orderTable){
+        double profit = deliveryCost(orderTable) * 0.25;
+        return profit;
+    }
+
+    public static double customerCharge(double[] orderTable){
+        double customerCharge = TotalOperationCost(orderTable) + profit(orderTable);
+        return customerCharge;
+
+    }
 
 }
