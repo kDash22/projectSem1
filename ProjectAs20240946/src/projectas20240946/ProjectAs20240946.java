@@ -12,9 +12,9 @@ import java.util.Scanner;
  */
 public class ProjectAs20240946 {
     static final double FUEL_PRICE = 310;
-   
+    static final int MAX_CITIES = 30;
     public static void main(String[] args) {
-        final int MAX_CITIES = 30;
+        
 
 
         final double[][] VEHICLE_TABLE =  new double[5][5];
@@ -47,9 +47,9 @@ public class ProjectAs20240946 {
         VEHICLE_TABLE[2][3] = 4;;
 
         int indexCities = 0  ;
-        String cities[] = new String[MAX_CITIES];
-        double distanceTable[][] = new double[MAX_CITIES][MAX_CITIES];
-        double orderTable[] = new double[6];
+        String[] cities = new String[MAX_CITIES];
+        double[][]  distanceTable= new double[MAX_CITIES][MAX_CITIES];
+        double[] orderTable = new double[6];
         /* distance =       orderTable[0]
          * weight =         orderTable[1]
          * Rate per km =    orderTable[2]
@@ -59,6 +59,23 @@ public class ProjectAs20240946 {
          */
 
 
+
+        String[][] deliveryRecord = new String[50][13]; 
+        /* NIC =                deliveryRecord[][0] 
+         * from =               deliveryRecord[][1]
+         * to =                 deliveryRecord[][2]
+         * minimun distance =   deliveryRecord[][3]
+         * vehicle =            deliveryRecord[][4]
+         * weight =             deliveryRecord[][5]
+         * base cost =          deliveryRecord[][6]
+         * fuel used =          deliveryRecord[][7]
+         * fuel cost =          deliveryRecord[][8]
+         * operation cost =     deliveryRecord[][9]
+         * profit =             deliveryRecord[][10]
+         * customer charge =    deliveryRecord[][11]
+         * estimated time =     deliveryRecord[][12]
+         * */
+
         //for testing purposes
         cities[0]="colombo";
         cities[1]="homagama";
@@ -66,8 +83,18 @@ public class ProjectAs20240946 {
         cities[2]="kottawa";
         cities[4]="nugegoda";
         cities[5]="kirulapone";
-        renameCity(cities);
-        System.out.println(cities[0]);
+        //for testing purposes
+        double[][] distances = {
+                                { 0, 50, 14, 18, 10,  6}, // Colombo
+                                {50,  0, 10,  7, 40, 20}, // Homagama
+                                {14, 10,  0,  5, 20, 12}, // Maharagama
+                                {18,  7,  5,  0, 12, 15}, // Kottawa
+                                {10, 40, 20, 12,  0,  9}, // Nugegoda
+                                { 6, 20, 12, 15,  9,  0}  // Kirulapone
+                            };
+        double minimumDistance = minimumDistance(distances, 0,1);
+        System.out.println("min distance is "+minimumDistance);                 
+    
                 
         
         
@@ -213,7 +240,7 @@ public static void renameCity(String[] array){
         input.close();
     }
 
-    public static void addOder(String[] citiyTable, double[][] distanceTable, double[][] vehicleTable, double[] orderTable){
+    public static void addOder(String[] citiyTable, double[][] distanceTable, double[][] vehicleTable, double[] orderTable, String[][] deliveryRecord){
         double cargo;
         int vehicleIndex ;
 
@@ -260,6 +287,7 @@ public static void renameCity(String[] array){
          * VEHICLE_TABLE[][3] = FUEL EFFICIENCY (KM per LITER)
          
         */
+
         
         orderTable[0] = distanceTable[sourceIndex][destinationIndex];
         orderTable[1] = cargo;
@@ -267,7 +295,69 @@ public static void renameCity(String[] array){
         orderTable[3] = vehicleTable[vehicleIndex ][2];
         orderTable[4] = vehicleTable[vehicleIndex ][3];
         orderTable[5] = FUEL_PRICE;
+        
+        int openIndex = -1;
+        for(int i = 0 ; i<50 ; i++){
+            if (deliveryRecord[i][0] == null ) {
+                openIndex = i;
+                }
+        }
+        System.out.println("What is your NIC number ? ");//assumned everyone has the new format of NIC ie; 12 digits
+        long NIC = input.nextLong();
+        if (openIndex == 1) {
+            System.out.println("Delivery record is full");
+            return;
+            
+        }
+        
+        deliveryRecord[openIndex][0] = String.valueOf(NIC);
+        deliveryRecord[openIndex][1] = source;
+        deliveryRecord[openIndex][2] = destination;
+        deliveryRecord[openIndex][3] = String.valueOf(minimumDistance(distanceTable, sourceIndex, destinationIndex))+" km";
+        switch (vehicleIndex) {
+            case 0:
+                deliveryRecord[openIndex][4] = "Van";
+                break;
+            case 1:
+                deliveryRecord[openIndex][4] = "Truck";
+                break;
+            case 2:
+                deliveryRecord[openIndex][4] = "Lorry";    
+        
+            default:
+                break;
+        }
+        /* NIC =                deliveryRecord[][0] 
+         * from =               deliveryRecord[][1]
+         * to =                 deliveryRecord[][2]
+         * minimun distance =   deliveryRecord[][3]
+         * vehicle =            deliveryRecord[][4]
+         * weight =             deliveryRecord[][5]
+         * base cost =          deliveryRecord[][6]
+         * fuel used =          deliveryRecord[][7]
+         * fuel cost =          deliveryRecord[][8]
+         * operation cost =     deliveryRecord[][9]
+         * profit =             deliveryRecord[][10]
+         * customer charge =    deliveryRecord[][11]
+         * estimated time =     deliveryRecord[][12]
+         * */
+        deliveryRecord[openIndex][5] = String.valueOf(cargo)+" kg";
+        deliveryRecord[openIndex][6] = "LKR " + String.valueOf(deliveryCost(orderTable));
+        deliveryRecord[openIndex][7] = String.valueOf(fuelConsumption(orderTable))+ " liters ";
+        deliveryRecord[openIndex][8] = "LKR " + String.valueOf(fuelCost(orderTable));
+        deliveryRecord[openIndex][9] = "LKR " + String.valueOf(TotalOperationCost(orderTable));
+        deliveryRecord[openIndex][10] = "LKR " + String.valueOf(profit(orderTable));
+        deliveryRecord[openIndex][11] = "LKR " + String.valueOf(profit(orderTable));
+        deliveryRecord[openIndex][12] = String.valueOf(estimatedDeliveryTime(orderTable)) + " hours";
+
     }
+
+
+
+
+
+
+    
     public static double deliveryCost(double[] orderTable){
         /* distance =       orderTable[0]
          * weight =         orderTable[1]
@@ -286,7 +376,7 @@ public static void renameCity(String[] array){
     }
 
     public static double fuelConsumption(double[] orderTable){
-         /* distance =       orderTable[0]
+        /* distance =       orderTable[0]
          * weight =         orderTable[1]
          * Rate per km =    orderTable[2]
          * Vehicle speed =  orderTable[3]
@@ -318,5 +408,25 @@ public static void renameCity(String[] array){
         return customerCharge;
 
     }
+    public static double minimumDistance(double[][] distanceTable,int source, int destination ){
+        double minimumDistance = distanceTable[source][destination];
+        for(int i = 0; i<MAX_CITIES; i++ ){
+            for(int j = 0; j<MAX_CITIES; j++){
+                for(int k = 0; k<MAX_CITIES; k++){
+                    double testDistance = distanceTable[source][i] + distanceTable[i][j] + distanceTable[j][k]+distanceTable[k][destination];
+                    if(minimumDistance > testDistance){
+                        minimumDistance = testDistance;
+                    }
+                }
+            }
+        }
+        return minimumDistance;  
+    }
+        
 
+
+
+
+
+    
 }
