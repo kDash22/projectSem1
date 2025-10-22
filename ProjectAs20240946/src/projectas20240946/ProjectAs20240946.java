@@ -13,6 +13,7 @@ import java.util.Scanner;
 public class ProjectAs20240946 {
     static final double FUEL_PRICE = 310;
     static final int MAX_CITIES = 30;
+    static final double INFINITY = 999999999;
     public static void main(String[] args) {
         
 
@@ -60,7 +61,7 @@ public class ProjectAs20240946 {
 
 
 
-        String[][] deliveryRecord = new String[50][13]; 
+        String[][] deliveryRecord = new String[50][14]; 
         /* NIC =                deliveryRecord[][0] 
          * from =               deliveryRecord[][1]
          * to =                 deliveryRecord[][2]
@@ -74,6 +75,7 @@ public class ProjectAs20240946 {
          * profit =             deliveryRecord[][10]
          * customer charge =    deliveryRecord[][11]
          * estimated time =     deliveryRecord[][12]
+         * rater per km =       deliveryRecord[][13]
          * */
 
         //for testing purposes
@@ -92,8 +94,20 @@ public class ProjectAs20240946 {
                                 {10, 40, 20, 12,  0,  9}, // Nugegoda
                                 { 6, 20, 12, 15,  9,  0}  // Kirulapone
                             };
-        double minimumDistance = minimumDistance(distances, 0,1);
-        System.out.println("min distance is "+minimumDistance);                 
+        //for testing purposes
+        String[][] testDeliveryRecord = {
+    
+    {"200134567", "Colombo",    "Kottawa",     "18",        "Van",      "1500",     "800",       "3.5",       "1575",      "2000",    "925",     "2925",        "35",    "90"},
+    {"991245678", "Homagama",   "Nugegoda",    "40",        "Lorry",    "5000",     "2000",      "9.0",       "4050",      "5200",    "2050",    "7250",        "70",    "95"},
+    {"200112345", "Kirulapone", "Colombo",     "6",         "Truck",    "2000",     "1000",      "2.0",       "900",       "1300",    "600",     "1900",        "15",    "95"},
+    {"200078945", "Maharagama", "Homagama",    "10",        "Van",      "1200",     "700",       "2.5",       "1125",      "1500",    "625",     "2125",        "25",    "85"},
+    {"993456781", "Nugegoda",   "Kirulapone",  "9",         "Truck",    "3500",     "1500",      "3.0",       "1350",      "1800",    "850",     "2650",        "20",    "88"},
+    {"200234567", "Kottawa",    "Colombo",     "18",        "Lorry",    "8000",     "3000",      "10.5",      "4725",      "6000",    "2000",    "8000",        "50",    "90"},
+    {"200998877", "Colombo",    "Homagama",    "25",        "Truck",    "2500",     "1200",      "5.0",       "2250",      "2800",    "1250",    "4050",        "40",    "85"}
+};
+
+        
+        generatePerformanceReport(testDeliveryRecord);       
     
                 
         
@@ -191,7 +205,7 @@ public static void updateDistance(String[] city, double[][] distance) {
         System.out.println("What is the name of the city ? ");
         Scanner input = new Scanner(System.in);
         String cityName=input.nextLine();
-        array[index]=cityName.toUpperCase();
+        array[index]=cityName.substring(0,1).toUpperCase() + cityName.substring(1).toLowerCase();
         index=index+1;
         input.close();
         return(index);
@@ -252,19 +266,19 @@ public static void renameCity(String[] array){
         System.out.println("What is the destination city name ? ");
         String destination = input.nextLine();
         int destinationIndex = getCityIndex(citiyTable, destination);
-        if (source == destination) {
+        if (sourceIndex == destinationIndex) {
             System.out.println("Souce city and Destination city cannot be the same .");
             System.out.println("Invalid input. please try again !!!");
             return;
             
         }
         while (true) {
-            System.out.println("How much cargo do you want to transpot ? (in kg) ");
+            System.out.println("How much cargo does the customer want to transpot ? (in kg) ");
             cargo = input.nextDouble();
-            System.out.println("What is your prefered vehicle type ? (1 = Van, 2 = Truck, 3 = Lorry)" );
+            System.out.println("What is the customer's prefered vehicle type ? (1 = Van, 2 = Truck, 3 = Lorry)" );
             vehicleIndex = input.nextInt()-1;
             if (vehicleTable[vehicleIndex][0] < cargo ) {
-                System.out.println("Your prefered vehicle doesn't allow your required cargo weight.");
+                System.out.println("The customer's prefered vehicle doesn't allow the cargo weight.");
                 System.out.println("Invalid input. please try again !!!");
                 continue;
                 }
@@ -289,7 +303,7 @@ public static void renameCity(String[] array){
         */
 
         
-        orderTable[0] = distanceTable[sourceIndex][destinationIndex];
+        orderTable[0] = minimumDistance(distanceTable, sourceIndex, destinationIndex); // it was assumed that minimum distance was used to calculate the costs because of the output given eventhough it was mentioned distance was taken from distance matrix for consistency 
         orderTable[1] = cargo;
         orderTable[2] = vehicleTable[vehicleIndex ][1];
         orderTable[3] = vehicleTable[vehicleIndex ][2];
@@ -302,7 +316,7 @@ public static void renameCity(String[] array){
                 openIndex = i;
                 }
         }
-        System.out.println("What is your NIC number ? ");//assumned everyone has the new format of NIC ie; 12 digits
+        System.out.println("What is the customer's NIC number ? ");//assumned everyone has the new format of NIC ie; 12 digits
         long NIC = input.nextLong();
         if (openIndex == 1) {
             System.out.println("Delivery record is full");
@@ -311,8 +325,8 @@ public static void renameCity(String[] array){
         }
         
         deliveryRecord[openIndex][0] = String.valueOf(NIC);
-        deliveryRecord[openIndex][1] = source;
-        deliveryRecord[openIndex][2] = destination;
+        deliveryRecord[openIndex][1] = source.substring(0,1).toUpperCase() + source.substring(1).toLowerCase();
+        deliveryRecord[openIndex][2] = destination.substring(0,1).toUpperCase() + destination.substring(1).toLowerCase();
         deliveryRecord[openIndex][3] = String.valueOf(minimumDistance(distanceTable, sourceIndex, destinationIndex))+" km";
         switch (vehicleIndex) {
             case 0:
@@ -323,7 +337,7 @@ public static void renameCity(String[] array){
                 break;
             case 2:
                 deliveryRecord[openIndex][4] = "Lorry";    
-        
+                break;
             default:
                 break;
         }
@@ -340,15 +354,19 @@ public static void renameCity(String[] array){
          * profit =             deliveryRecord[][10]
          * customer charge =    deliveryRecord[][11]
          * estimated time =     deliveryRecord[][12]
+         * rater per km =       deliveryRecord[][13]
          * */
-        deliveryRecord[openIndex][5] = String.valueOf(cargo)+" kg";
-        deliveryRecord[openIndex][6] = "LKR " + String.valueOf(deliveryCost(orderTable));
-        deliveryRecord[openIndex][7] = String.valueOf(fuelConsumption(orderTable))+ " liters ";
-        deliveryRecord[openIndex][8] = "LKR " + String.valueOf(fuelCost(orderTable));
-        deliveryRecord[openIndex][9] = "LKR " + String.valueOf(TotalOperationCost(orderTable));
-        deliveryRecord[openIndex][10] = "LKR " + String.valueOf(profit(orderTable));
-        deliveryRecord[openIndex][11] = "LKR " + String.valueOf(profit(orderTable));
-        deliveryRecord[openIndex][12] = String.valueOf(estimatedDeliveryTime(orderTable)) + " hours";
+        deliveryRecord[openIndex][5] = String.valueOf(cargo);
+        deliveryRecord[openIndex][6] = String.valueOf(deliveryCost(orderTable));
+        deliveryRecord[openIndex][7] = String.valueOf(fuelConsumption(orderTable));
+        deliveryRecord[openIndex][8] = String.valueOf(fuelCost(orderTable));
+        deliveryRecord[openIndex][9] = String.valueOf(TotalOperationCost(orderTable));
+        deliveryRecord[openIndex][10] = String.valueOf(profit(orderTable));
+        deliveryRecord[openIndex][11] = String.valueOf(profit(orderTable)+TotalOperationCost(orderTable));
+        deliveryRecord[openIndex][12] = String.valueOf(estimatedDeliveryTime(orderTable));
+        deliveryRecord[openIndex][13] = String.valueOf(orderTable[2]);
+
+        generateDeliveryReciept(deliveryRecord, openIndex);
 
     }
 
@@ -357,7 +375,7 @@ public static void renameCity(String[] array){
 
 
 
-    
+
     public static double deliveryCost(double[] orderTable){
         /* distance =       orderTable[0]
          * weight =         orderTable[1]
@@ -422,7 +440,80 @@ public static void renameCity(String[] array){
         }
         return minimumDistance;  
     }
-        
+    public static void generateDeliveryReciept(String[][] deliveryRecord,int openIndex){
+        System.out.println();
+        System.out.println("==============================================================================");
+        System.out.println("DELIVERY COST ESTIMATION ");
+        System.out.println("------------------------------------------------------------------------------");
+        System.out.println("From : " + deliveryRecord[openIndex][1]);
+        System.out.println("To : " + deliveryRecord[openIndex][2]);
+        System.out.println("Minimum Distance : " + deliveryRecord[openIndex][3]+" km");
+        System.out.println("Vehicle : " + deliveryRecord[openIndex][4]);
+        System.out.println("Weight : " + deliveryRecord[openIndex][5]+" kg"); 
+        System.out.println("------------------------------------------------------------------------------");
+        System.out.println("Base Cost : "+ deliveryRecord[openIndex][3]+" X " + deliveryRecord[openIndex][13]+" X "+"( 1 + "+deliveryRecord[openIndex][5]+" / 10000 )"+" = "+ deliveryRecord[openIndex][6]+" LKR");
+        System.out.println("Fuel Used : " + deliveryRecord[openIndex][7]+" L");
+        System.out.println("Fuel Cost :" + deliveryRecord[openIndex][8]+" LKR");
+        System.out.println("Operational Cost : " + deliveryRecord[openIndex][9]+" LKR");
+        System.out.println("Profit : " + deliveryRecord[openIndex][10]+" LKR");
+        System.out.println("Customer Charge : " + deliveryRecord[openIndex][11]+" LKR");
+        System.out.println("Estimated Time : " + deliveryRecord[openIndex][12]+" hours"); 
+        System.out.println("==============================================================================");
+        System.out.println();
+
+    }
+    public static void generatePerformanceReport(String[][] deliveryRecord){
+        int deliveries = 0;
+        double totalDistanceTravelled = 0;
+        double totalTime = 0;
+        int count = 1;
+        double totalRevenue = 0;
+        double totalProfit = 0;
+        double longestRoute = 0;
+        double shortestRoute = INFINITY;
+        for(int i = 0 ; i<7 ; i++){
+            if (deliveryRecord[i][0] != null && !deliveryRecord[i][0].isEmpty() ) {
+                deliveries = i;
+                }
+            if(deliveryRecord[i][3] != null && !deliveryRecord[i][3].isEmpty()){
+                totalDistanceTravelled += Double.parseDouble(deliveryRecord[i][3]);
+                }
+            if(deliveryRecord[i][12] != null && !deliveryRecord[i][12].isEmpty()){
+                totalTime += Double.parseDouble(deliveryRecord[i][12]);
+                count += 1;
+                }
+
+            if(deliveryRecord[i][11] != null && !deliveryRecord[i][11].isEmpty()){
+                totalRevenue += Double.parseDouble(deliveryRecord[i][11]);
+                totalProfit+= Double.parseDouble(deliveryRecord[i][10]);
+                }
+            if(deliveryRecord[i][3] != null && !deliveryRecord[i][3].isEmpty() && longestRoute < Double.parseDouble(deliveryRecord[i][3])){
+                longestRoute = Double.parseDouble(deliveryRecord[i][3]);
+                }
+            if(deliveryRecord[i][3] != null && !deliveryRecord[i][3].isEmpty() && shortestRoute > Double.parseDouble(deliveryRecord[i][3])){
+                shortestRoute = Double.parseDouble(deliveryRecord[i][3]);
+                }   
+        }
+        double avgDeliveryTime = totalTime/count;
+        System.out.println();
+        System.out.println("====================================================");
+        System.out.println("PERFORMANCE REPORT");
+        System.out.println("----------------------------------------------------");
+        System.out.println("Total Deliveries Completed : "+deliveries);
+        System.out.println("Total Distance Covered : "+totalDistanceTravelled+" KM");
+        System.out.println("Average Deilvery Time : "+avgDeliveryTime);
+        System.out.println("Total Revenue :"+totalRevenue+" LKR");
+        System.out.println("Total Profit : "+totalProfit+" LKR");
+        System.out.println("Longest Route Completed : "+longestRoute+" km");
+        System.out.println("Shortest Route Completed : "+shortestRoute+" km");
+        System.out.println("----------------------------------------------------");
+        System.out.println();
+
+
+
+
+
+    }
 
 
 
