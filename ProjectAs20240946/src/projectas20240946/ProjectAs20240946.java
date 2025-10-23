@@ -4,6 +4,10 @@
  */
 package projectas20240946;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
 /**
@@ -11,10 +15,14 @@ import java.util.Scanner;
  * @author Kalana Dasanayaka
  */
 public class ProjectAs20240946 {
+
+
     static final double FUEL_PRICE = 310;
     static final int MAX_CITIES = 10;
     static final double INFINITY = 999999999;
     static Scanner input = new Scanner(System.in);
+
+
     public static void main(String[] args) {
         
 
@@ -127,7 +135,9 @@ public class ProjectAs20240946 {
     
                 
         
-        menu(cityTable, distanceMatrix, VEHICLE_TABLE, orderTable, deliveryRecord);
+        storeCityTable(testCities);
+        storeDistanceMatrix(testDistanceMatrix);
+        storeDeliveryRecord(testDeliveryRecord);
         
         input.close();
     }
@@ -162,20 +172,24 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
 
                     switch (firstSubMenuChoice) {
                         case 1 :
-                         addCity(cityTable);
-                         break;
+                            addCity(cityTable);
+                            storeCityTable(cityTable);
+                            break;
                         case 2 :
-                        renameCity(cityTable);
-                        break;
+                            renameCity(cityTable);
+                            storeCityTable(cityTable);
+                            break;
                         case 3 :
-                         removeCity(cityTable);
-                         break;
+                            removeCity(cityTable,distanceMatrix);
+                            storeCityTable(cityTable);
+                            storeDistanceMatrix(distanceMatrix);
+                            break;
                         case 0 :
-                         System.out.println("Returning to Main Menu...");
-                         break;
+                            System.out.println("Returning to Main Menu...");
+                            break;
                         default :
-                         System.out.println("Invalid input !!!");
-                         break;
+                            System.out.println("Invalid input !!!");
+                            break;
                     }
                 }
                 break;}
@@ -194,6 +208,7 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
                     switch (secondSubMenuChoice) {
                         case 1 :
                             updateDistance(cityTable, distanceMatrix);
+                            storeDistanceMatrix(distanceMatrix);
                             break;
                         case 2 : 
                             displayDistanceMatrix(distanceMatrix, cityTable);
@@ -212,6 +227,7 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
 
             case 3 :
                  addOder(cityTable, distanceMatrix, vehicleTable, orderTable, deliveryRecord);
+                 storeDeliveryRecord(deliveryRecord);
                  break;
             case 4 :
                  generatePerformanceReport(deliveryRecord);
@@ -285,12 +301,16 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
     }
 
     
-    public static void removeCity(String[] array){
+    public static void removeCity(String[] cityTable, double[][] distanceMatrix){
         System.out.println("What city do you need removed ? ");
          
         String city = input.nextLine();
-        int index = getCityIndex(array, city);
-        array[index] = "";
+        int index = getCityIndex(cityTable, city);
+        cityTable[index] = null;
+        System.out.println("City removed successfully !");
+        for(int i = 0 ; i < distanceMatrix[index].length ; i++ ){
+            distanceMatrix[index][i] = -1;
+        }
           
     }
 
@@ -600,6 +620,86 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
 
 
 
+    }
+    public static void storeCityTable(String[] cityTable){
+        try{
+            FileWriter writer = new FileWriter("City Table.text");
+            for(int i = 0; i <cityTable.length; i++){
+                writer.write(cityTable[i] + "\n");
+            }
+            writer.close();
+            System.out.println("Cities saved successfully. ");
+        } catch (IOException e) {
+            System.out.println("An error occurred while writing to the file.");
+            e.printStackTrace();
+        }
+    }
+    public static void storeDistanceMatrix(double[][] distanceMatrix){
+        try {
+            FileWriter writer = new FileWriter("Distance Matrix.text");
+            for(int i = 0; i < distanceMatrix.length ; i++){
+                for(int j = 0; j < distanceMatrix[i].length ; j++){
+                    writer.write(String.format("%-8s",String.valueOf(distanceMatrix[i][j])));
+                    if(j < distanceMatrix[i].length - 1){
+                        writer.write("\t");
+                    }
+                }
+                writer.write("\n");
+
+            }
+            writer.close();
+            System.out.println("Distance matrix saved successfully.");
+        } catch (Exception e) {
+            System.out.println("An error occurred while writing to the file.");
+            e.printStackTrace();
+        }
+
+
+
+    }
+    public static void storeDeliveryRecord(String[][] deliveryRecord){
+        try {
+            FileWriter writer = new FileWriter("Delivery Record.text");
+            for(int i = 0; i < deliveryRecord.length ; i++){
+                for(int j = 0; j < deliveryRecord[i].length ; j++){
+                    writer.write(String.format("%-20s",deliveryRecord[i][j]));
+                    if(j < deliveryRecord[i].length - 1){
+                        writer.write("\t");
+                    }
+                }
+                writer.write("\n");
+
+            }
+            writer.close();
+            System.out.println("Delivery Record saved successfully.");
+        } catch (Exception e) {
+            System.out.println("An error occurred while writing to the file.");
+            e.printStackTrace();
+        }
+
+
+
+    }
+    public static void loadCityTable(String[] cityTable){
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("City Table.text"));
+
+            String city;
+            for(int i =0 ; i < MAX_CITIES; i++){
+                city = reader.readLine();
+                if(city != null){
+                    cityTable[i] = city.trim();
+                }
+                else{
+                    cityTable[i] = null;
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            
+        }
+        
     }
 
 
