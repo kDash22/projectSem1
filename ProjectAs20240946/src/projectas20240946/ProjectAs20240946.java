@@ -17,10 +17,11 @@ import java.util.Scanner;
 public class ProjectAs20240946 {
 
 
-    static final double FUEL_PRICE = 310;
-    static final int MAX_CITIES = 10;
-    static final double INFINITY = 999999999;
-    static Scanner input = new Scanner(System.in);
+    static final double FUEL_PRICE = 310; 
+    static final int MAX_CITIES = 30;
+    static final int MAX_RECORDS = 50;
+    static final double INFINITY = 999999999; //used for methods needing a very large value
+    static Scanner input = new Scanner(System.in); //singular global input for ease of programming 
 
 
     public static void main(String[] args) {
@@ -29,7 +30,7 @@ public class ProjectAs20240946 {
 
         final double[][] VEHICLE_TABLE =  new double[5][5];
         /*  VEHICLE_TABLE[0][] = VAN
-            VHEICALE_TABLE[1][] = TRUCK
+            VEHICLE_TABLE[1][] = TRUCK
             VEHICLE_TABLE[2][] = LORRY
          
          * VEHICLE_TABLE[][0] = CAPACITY (KG)
@@ -75,74 +76,34 @@ public class ProjectAs20240946 {
 
 
 
-        String[][] deliveryRecord = new String[50][14]; 
-        /* NIC =                deliveryRecord[][0] 
-         * from =               deliveryRecord[][1]
-         * to =                 deliveryRecord[][2]
-         * minimun distance =   deliveryRecord[][3]
-         * vehicle =            deliveryRecord[][4]
-         * weight =             deliveryRecord[][5]
-         * base cost =          deliveryRecord[][6]
-         * fuel used =          deliveryRecord[][7]
-         * fuel cost =          deliveryRecord[][8]
-         * operation cost =     deliveryRecord[][9]
-         * profit =             deliveryRecord[][10]
-         * customer charge =    deliveryRecord[][11]
-         * estimated time =     deliveryRecord[][12]
-         * rater per km =       deliveryRecord[][13]
+        String[][] deliveryRecord = new String[MAX_RECORDS][13]; 
+        /* 
+         * from =               deliveryRecord[][0]
+         * to =                 deliveryRecord[][1]
+         * minimun distance =   deliveryRecord[][2]
+         * vehicle =            deliveryRecord[][3]
+         * weight =             deliveryRecord[][4]
+         * base cost =          deliveryRecord[][5]
+         * fuel used =          deliveryRecord[][6]
+         * fuel cost =          deliveryRecord[][7]
+         * operation cost =     deliveryRecord[][8]
+         * profit =             deliveryRecord[][9]
+         * customer charge =    deliveryRecord[][10]
+         * estimated time =     deliveryRecord[][11]
+         * rater per km =       deliveryRecord[][12]
          * */
 
-        //for testing purposes
-            String[] testCities = {
-                "Colombo",        // 0
-                "Kandy",          // 1
-                "Galle",          // 2
-                "Matara",         // 3
-                "Jaffna",         // 4
-                "Trincomalee",    // 5
-                "Batticaloa",     // 6
-                "Negombo",        // 7
-                "Kurunegala",     // 8
-                "Anuradhapura",   // 9
-            };
-
-        //for testing purposes
-        String[][] testDeliveryRecord = {
+ 
     
-    {"200134567", "Colombo",    "Kottawa",     "18",        "Van",      "1500",     "800",       "3.5",       "1575",      "2000",    "925",     "2925",        "35",    "90"},
-    {"991245678", "Homagama",   "Nugegoda",    "40",        "Lorry",    "5000",     "2000",      "9.0",       "4050",      "5200",    "2050",    "7250",        "70",    "95"},
-    {"200112345", "Kirulapone", "Colombo",     "6",         "Truck",    "2000",     "1000",      "2.0",       "900",       "1300",    "600",     "1900",        "15",    "95"},
-    {"200078945", "Maharagama", "Homagama",    "10",        "Van",      "1200",     "700",       "2.5",       "1125",      "1500",    "625",     "2125",        "25",    "85"},
-    {"993456781", "Nugegoda",   "Kirulapone",  "9",         "Truck",    "3500",     "1500",      "3.0",       "1350",      "1800",    "850",     "2650",        "20",    "88"},
-    {"200234567", "Kottawa",    "Colombo",     "18",        "Lorry",    "8000",     "3000",      "10.5",      "4725",      "6000",    "2000",    "8000",        "50",    "90"},
-    {"200998877", "Colombo",    "Homagama",    "25",        "Truck",    "2500",     "1200",      "5.0",       "2250",      "2800",    "1250",    "4050",        "40",    "85"}
-};
-        //for testing purposes
-
-        double[][] testDistanceMatrix = {
-            //  0    1    2    3    4    5    6    7    8    9
-            {  0, 115, 120, 400,  38,  94, 205, 105, 275, 160}, // Colombo
-            {115,   0, 230, 365, 120,  42, 150,  95, 185, 245}, // Kandy
-            {120, 230,   0, 520, 155, 210, 315, 140, 365,  45}, // Galle
-            {400, 365, 520,   0, 370, 250, 195, 420, 220, 515}, // Jaffna
-            { 38, 120, 155, 370,   0,  72, 190, 125, 260, 175}, // Negombo
-            { 94,  42, 210, 250,  72,   0, 115,  80, 155, 210}, // Kurunegala
-            {205, 150, 315, 195, 190, 115,   0, 220, 125, 300}, // Anuradhapura
-            {105,  95, 140, 420, 125,  80, 220,   0, 280, 120}, // Ratnapura
-            {275, 185, 365, 220, 260, 155, 125, 280,   0, 345}, // Trincomalee
-            {160, 245,  45, 515, 175, 210, 300, 120, 345,   0}  // Matara
-        };   
-    
-                
+        menu(cityTable, distanceMatrix, VEHICLE_TABLE, orderTable, deliveryRecord);
         
-        storeCityTable(testCities);
-        storeDistanceMatrix(testDistanceMatrix);
-        storeDeliveryRecord(testDeliveryRecord);
         
         input.close();
     }
 public static void menu(String[] cityTable, double[][] distanceMatrix, double[][] vehicleTable,double[] orderTable, String[][] deliveryRecord) {
-
+    loadCityTable(cityTable);// load data from the txt files
+    loadDeliveryRecord(deliveryRecord);
+    loadDistanceMatrix(distanceMatrix);
      
     int choice = -1;
 
@@ -153,9 +114,25 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
         System.out.println("3. Delivery Request Handling");
         System.out.println("4. Reports");
         System.out.println("0. Exit");
-        System.out.print("Menu Option: ");
-        choice = input.nextInt();
-        input.nextLine();
+        
+        while (true) {
+            System.out.println();
+            System.out.print("Menu Option: ");
+            String choiceHolder = input.nextLine();
+            System.out.println();
+            try {//checkin if the input is an integer, if this code block is not present the program crashes if a wrong data type is entered
+                choice = Integer.parseInt(choiceHolder);
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println();
+                System.out.println("Please input an integer input relevent to the options shown.");
+                System.out.println();
+            
+            }
+            
+        }
+        
+        
 
         switch (choice) {
             case 1:{
@@ -166,9 +143,23 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
                     System.out.println("2. Rename City");
                     System.out.println("3. Remove City");
                     System.out.println("0. Back");
-                    System.out.print("Option: ");
-                    firstSubMenuChoice = input.nextInt();
-                    input.nextLine();
+                   
+                    while (true) {
+                        System.out.println();
+                        System.out.print("Option: ");
+                        String firstSubMenuChoiceHolder = input.nextLine();
+                        System.out.println();
+                        try {{//checkin if the input is an integer, if this code block is not present the program crashes if a wrong data type is entered
+                            firstSubMenuChoice = Integer.parseInt(firstSubMenuChoiceHolder);
+                            break;
+                        } catch (NumberFormatException e) {
+                            System.out.println();
+                            System.out.println("Please input an integer input relevent to the options shown.");
+                            System.out.println();
+                        
+                        }
+                        
+                    }
 
                     switch (firstSubMenuChoice) {
                         case 1 :
@@ -185,10 +176,14 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
                             storeDistanceMatrix(distanceMatrix);
                             break;
                         case 0 :
+                            System.out.println();
                             System.out.println("Returning to Main Menu...");
+                            System.out.println();
                             break;
                         default :
+                            System.out.println();
                             System.out.println("Invalid input !!!");
+                            System.out.println();
                             break;
                     }
                 }
@@ -201,9 +196,23 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
                     System.out.println("1. Update Distance");
                     System.out.println("2. Display Distance Matrix");
                     System.out.println("0. Back");
-                    System.out.print("Option: ");
-                    secondSubMenuChoice = input.nextInt();
-                    input.nextLine();
+                    
+                    while (true) {
+                        System.out.println();
+                        System.out.print("Option: ");
+                        String secondSubMenuChoiceHolder = input.nextLine();
+                        System.out.println();
+                        try {{//checkin if the input is an integer, if this code block is not present the program crashes if a wrong data type is entered
+                            secondSubMenuChoice = Integer.parseInt(secondSubMenuChoiceHolder);
+                            break;
+                        } catch (NumberFormatException e) {
+                            System.out.println();
+                            System.out.println("Please input an integer input relevent to the options shown.");
+                            System.out.println();
+                        
+                        }
+                        
+                    }
 
                     switch (secondSubMenuChoice) {
                         case 1 :
@@ -215,23 +224,27 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
                             break;
 
                         case 0 :
-                             System.out.println("Returning to Main Menu...");
-                             break;
+                            System.out.println();
+                            System.out.println("Returning to Main Menu...");
+                            System.out.println(); 
+                            break;
 
                         default :
-                             System.out.println("Invalid input !!!");
-                             break;
+                            System.out.println();
+                            System.out.println("Invalid input !!!");
+                            System.out.println();
+                            break;
                     }
                 }
                 break;
 
             case 3 :
-                 addOder(cityTable, distanceMatrix, vehicleTable, orderTable, deliveryRecord);
-                 storeDeliveryRecord(deliveryRecord);
-                 break;
+                addOder(cityTable, distanceMatrix, vehicleTable, orderTable, deliveryRecord);
+                storeDeliveryRecord(deliveryRecord);
+                break;
             case 4 :
-                 generatePerformanceReport(deliveryRecord);
-                 break;
+                generatePerformanceReport(deliveryRecord);
+                break;
             case 0 :
                 System.out.println("Exiting...");
                 break;
@@ -453,40 +466,39 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
                 openIndex = i;
                 }
         }
-        System.out.println("What is the customer's NIC number ? ");//assumned everyone has the new format of NIC ie; 12 digits
-        long NIC = input.nextLong();
+        
         if (openIndex == 1) {
             System.out.println("Delivery record is full");
             return;
             
         }
         
-        deliveryRecord[openIndex][0] = String.valueOf(NIC);
-        deliveryRecord[openIndex][1] = source.substring(0,1).toUpperCase() + source.substring(1).toLowerCase();
-        deliveryRecord[openIndex][2] = destination.substring(0,1).toUpperCase() + destination.substring(1).toLowerCase();
-        deliveryRecord[openIndex][3] = String.valueOf(minimumDistance(distanceMatrix, sourceIndex, destinationIndex))+" km";
+        
+        deliveryRecord[openIndex][0] = source.substring(0,1).toUpperCase() + source.substring(1).toLowerCase();
+        deliveryRecord[openIndex][1] = destination.substring(0,1).toUpperCase() + destination.substring(1).toLowerCase();
+        deliveryRecord[openIndex][2] = String.valueOf(minimumDistance(distanceMatrix, sourceIndex, destinationIndex))+" km";
         switch (vehicleIndex) {
             case 0:
-                deliveryRecord[openIndex][4] = "Van";
+                deliveryRecord[openIndex][3] = "Van";
                 break;
             case 1:
-                deliveryRecord[openIndex][4] = "Truck";
+                deliveryRecord[openIndex][3] = "Truck";
                 break;
             case 2:
-                deliveryRecord[openIndex][4] = "Lorry";    
+                deliveryRecord[openIndex][3] = "Lorry";    
                 break;
             default:
                 break;
         }
-        deliveryRecord[openIndex][5] = String.valueOf(cargo);
-        deliveryRecord[openIndex][6] = String.valueOf(deliveryCost(orderTable));
-        deliveryRecord[openIndex][7] = String.valueOf(fuelConsumption(orderTable));
-        deliveryRecord[openIndex][8] = String.valueOf(fuelCost(orderTable));
-        deliveryRecord[openIndex][9] = String.valueOf(TotalOperationCost(orderTable));
-        deliveryRecord[openIndex][10] = String.valueOf(profit(orderTable));
-        deliveryRecord[openIndex][11] = String.valueOf(profit(orderTable)+TotalOperationCost(orderTable));
-        deliveryRecord[openIndex][12] = String.valueOf(estimatedDeliveryTime(orderTable));
-        deliveryRecord[openIndex][13] = String.valueOf(orderTable[2]);
+        deliveryRecord[openIndex][4] = String.valueOf(cargo);
+        deliveryRecord[openIndex][5] = String.valueOf(deliveryCost(orderTable));
+        deliveryRecord[openIndex][6] = String.valueOf(fuelConsumption(orderTable));
+        deliveryRecord[openIndex][7] = String.valueOf(fuelCost(orderTable));
+        deliveryRecord[openIndex][8] = String.valueOf(TotalOperationCost(orderTable));
+        deliveryRecord[openIndex][9] = String.valueOf(profit(orderTable));
+        deliveryRecord[openIndex][10] = String.valueOf(profit(orderTable)+TotalOperationCost(orderTable));
+        deliveryRecord[openIndex][11] = String.valueOf(estimatedDeliveryTime(orderTable));
+        deliveryRecord[openIndex][12] = String.valueOf(orderTable[2]);
 
         generateDeliveryReciept(deliveryRecord, openIndex);
 
@@ -552,19 +564,19 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
         System.out.println("==============================================================================");
         System.out.println("DELIVERY COST ESTIMATION ");
         System.out.println("------------------------------------------------------------------------------");
-        System.out.println("From : " + deliveryRecord[openIndex][1]);
-        System.out.println("To : " + deliveryRecord[openIndex][2]);
-        System.out.println("Minimum Distance : " + deliveryRecord[openIndex][3]+" km");
-        System.out.println("Vehicle : " + deliveryRecord[openIndex][4]);
-        System.out.println("Weight : " + deliveryRecord[openIndex][5]+" kg"); 
+        System.out.println("From : " + deliveryRecord[openIndex][0]);
+        System.out.println("To : " + deliveryRecord[openIndex][1]);
+        System.out.println("Minimum Distance : " + deliveryRecord[openIndex][2]+" km");
+        System.out.println("Vehicle : " + deliveryRecord[openIndex][3]);
+        System.out.println("Weight : " + deliveryRecord[openIndex][4]+" kg"); 
         System.out.println("------------------------------------------------------------------------------");
-        System.out.println("Base Cost : "+ deliveryRecord[openIndex][3]+" X " + deliveryRecord[openIndex][13]+" X "+"( 1 + "+deliveryRecord[openIndex][5]+" / 10000 )"+" = "+ deliveryRecord[openIndex][6]+" LKR");
-        System.out.println("Fuel Used : " + deliveryRecord[openIndex][7]+" L");
-        System.out.println("Fuel Cost :" + deliveryRecord[openIndex][8]+" LKR");
-        System.out.println("Operational Cost : " + deliveryRecord[openIndex][9]+" LKR");
-        System.out.println("Profit : " + deliveryRecord[openIndex][10]+" LKR");
-        System.out.println("Customer Charge : " + deliveryRecord[openIndex][11]+" LKR");
-        System.out.println("Estimated Time : " + deliveryRecord[openIndex][12]+" hours"); 
+        System.out.println("Base Cost : "+ deliveryRecord[openIndex][2]+" X " + deliveryRecord[openIndex][12]+" X "+"( 1 + "+deliveryRecord[openIndex][4]+" / 10000 )"+" = "+ deliveryRecord[openIndex][5]+" LKR");
+        System.out.println("Fuel Used : " + deliveryRecord[openIndex][6]+" L");
+        System.out.println("Fuel Cost :" + deliveryRecord[openIndex][7]+" LKR");
+        System.out.println("Operational Cost : " + deliveryRecord[openIndex][8]+" LKR");
+        System.out.println("Profit : " + deliveryRecord[openIndex][9]+" LKR");
+        System.out.println("Customer Charge : " + deliveryRecord[openIndex][10]+" LKR");
+        System.out.println("Estimated Time : " + deliveryRecord[openIndex][11]+" hours"); 
         System.out.println("==============================================================================");
         System.out.println();
 
@@ -578,27 +590,27 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
         double totalProfit = 0;
         double longestRoute = 0;
         double shortestRoute = INFINITY;
-        for(int i = 0 ; i<50 ; i++){
+        for(int i = 0 ; i<MAX_RECORDS ; i++){
             if (deliveryRecord[i][0] != null && !deliveryRecord[i][0].isEmpty() ) {
-                deliveries = i;
+                deliveries = i+1;
                 }
-            if(deliveryRecord[i][3] != null && !deliveryRecord[i][3].isEmpty()){
-                totalDistanceTravelled += Double.parseDouble(deliveryRecord[i][3]);
+            if(deliveryRecord[i][2] != null && !deliveryRecord[i][2].isEmpty()){
+                totalDistanceTravelled += Double.parseDouble(deliveryRecord[i][2]);
                 }
-            if(deliveryRecord[i][12] != null && !deliveryRecord[i][12].isEmpty()){
-                totalTime += Double.parseDouble(deliveryRecord[i][12]);
+            if(deliveryRecord[i][11] != null && !deliveryRecord[i][11].isEmpty()){
+                totalTime += Double.parseDouble(deliveryRecord[i][11]);
                 count += 1;
                 }
 
-            if(deliveryRecord[i][11] != null && !deliveryRecord[i][11].isEmpty()){
-                totalRevenue += Double.parseDouble(deliveryRecord[i][11]);
-                totalProfit+= Double.parseDouble(deliveryRecord[i][10]);
+            if(deliveryRecord[i][10] != null && !deliveryRecord[i][10].isEmpty()){
+                totalRevenue += Double.parseDouble(deliveryRecord[i][10]);
+                totalProfit+= Double.parseDouble(deliveryRecord[i][9]);
                 }
-            if(deliveryRecord[i][3] != null && !deliveryRecord[i][3].isEmpty() && longestRoute < Double.parseDouble(deliveryRecord[i][3])){
-                longestRoute = Double.parseDouble(deliveryRecord[i][3]);
+            if(deliveryRecord[i][2] != null && !deliveryRecord[i][2].isEmpty() && longestRoute < Double.parseDouble(deliveryRecord[i][2])){
+                longestRoute = Double.parseDouble(deliveryRecord[i][2]);
                 }
-            if(deliveryRecord[i][3] != null && !deliveryRecord[i][3].isEmpty() && shortestRoute > Double.parseDouble(deliveryRecord[i][3])){
-                shortestRoute = Double.parseDouble(deliveryRecord[i][3]);
+            if(deliveryRecord[i][2] != null && !deliveryRecord[i][2].isEmpty() && shortestRoute > Double.parseDouble(deliveryRecord[i][2])){
+                shortestRoute = Double.parseDouble(deliveryRecord[i][2]);
                 }   
         }
         double avgDeliveryTime = totalTime/count;
@@ -608,7 +620,7 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
         System.out.println("----------------------------------------------------");
         System.out.println("Total Deliveries Completed : "+deliveries);
         System.out.println("Total Distance Covered : "+totalDistanceTravelled+" KM");
-        System.out.println("Average Deilvery Time : "+avgDeliveryTime);
+        System.out.println("Average Deilvery Time : "+avgDeliveryTime+" Hours");
         System.out.println("Total Revenue :"+totalRevenue+" LKR");
         System.out.println("Total Profit : "+totalProfit+" LKR");
         System.out.println("Longest Route Completed : "+longestRoute+" km");
@@ -623,20 +635,20 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
     }
     public static void storeCityTable(String[] cityTable){
         try{
-            FileWriter writer = new FileWriter("City Table.text");
+            FileWriter writer = new FileWriter("City Table.txt");
             for(int i = 0; i <cityTable.length; i++){
                 writer.write(cityTable[i] + "\n");
             }
             writer.close();
-            System.out.println("Cities saved successfully. ");
+            
         } catch (IOException e) {
-            System.out.println("An error occurred while writing to the file.");
+            System.out.println("An error occurred while writing to the City Talble.txt.");
             e.printStackTrace();
         }
     }
     public static void storeDistanceMatrix(double[][] distanceMatrix){
         try {
-            FileWriter writer = new FileWriter("Distance Matrix.text");
+            FileWriter writer = new FileWriter("Distance Matrix.txt");
             for(int i = 0; i < distanceMatrix.length ; i++){
                 for(int j = 0; j < distanceMatrix[i].length ; j++){
                     writer.write(String.format("%-8s",String.valueOf(distanceMatrix[i][j])));
@@ -648,9 +660,9 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
 
             }
             writer.close();
-            System.out.println("Distance matrix saved successfully.");
+            
         } catch (Exception e) {
-            System.out.println("An error occurred while writing to the file.");
+            System.out.println("An error occurred while writing to the Distance Matrix.txt.");
             e.printStackTrace();
         }
 
@@ -659,7 +671,7 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
     }
     public static void storeDeliveryRecord(String[][] deliveryRecord){
         try {
-            FileWriter writer = new FileWriter("Delivery Record.text");
+            FileWriter writer = new FileWriter("Delivery Record.txt");
             for(int i = 0; i < deliveryRecord.length ; i++){
                 for(int j = 0; j < deliveryRecord[i].length ; j++){
                     writer.write(String.format("%-20s",deliveryRecord[i][j]));
@@ -671,9 +683,9 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
 
             }
             writer.close();
-            System.out.println("Delivery Record saved successfully.");
+            
         } catch (Exception e) {
-            System.out.println("An error occurred while writing to the file.");
+            System.out.println("An error occurred while writing to the Delivery Record.txt.");
             e.printStackTrace();
         }
 
@@ -682,7 +694,7 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
     }
     public static void loadCityTable(String[] cityTable){
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("City Table.text"));
+            BufferedReader reader = new BufferedReader(new FileReader("City Table.txt"));
 
             String city;
             for(int i =0 ; i < MAX_CITIES; i++){
@@ -699,12 +711,83 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
             e.printStackTrace();
             
         }
+        for (int i = 0; i < cityTable.length; i++) {
+            System.out.println(i + ": " + cityTable[i]);}
         
     }
+    public static void loadDistanceMatrix(double[][] distanceMatrix){
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("Distance Matrix.txt"));
+            String line;
+
+            for(int i = 0; i < MAX_CITIES ; i++){
+                line = reader.readLine();
+                if(line != null){
+                    String[] distance = line.trim().split("\\s+");
+                    for(int j=0; j<MAX_CITIES ; j++){
+                        distanceMatrix[i][j]=Double.parseDouble(distance[j]);
+
+                    }
+
+                }
+
+
+
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < MAX_CITIES; i++) {
+            for (int j = 0; j < MAX_CITIES; j++) {
+                System.out.print(distanceMatrix[i][j] + "\t");
+            }
+            System.out.println();
+
+
+
+        }
+
+
+
+    }
+    public static void loadDeliveryRecord(String[][] deliveryRecord){
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("Delivery Record.txt"));
+            String line;
+
+            for(int i = 0; i < MAX_RECORDS  ; i++){
+                line = reader.readLine();
+                if(line != null){
+                    String[] delivery = line.trim().split("\\s+");
+                    for(int j=0; j<13 ; j++){
+                        deliveryRecord[i][j]=delivery[j];
+
+                    }
+
+                }
+
+
+
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < MAX_RECORDS; i++) {
+            for (int j = 0; j < 13; j++) {
+                System.out.print(deliveryRecord[i][j] + "\t");
+            }
+            System.out.println();
+
+
+
+        }
 
 
 
 
-
-    
+    }
 }
+    
+
