@@ -59,6 +59,9 @@ public class ProjectAs20240946 {
 
         
         String[] cityTable = new String[MAX_CITIES];
+        for(int i =0 ; i<MAX_CITIES ; i++){
+            cityTable[i] = "";
+        }
         double[][]  distanceMatrix= new double[MAX_CITIES][MAX_CITIES];
         for(int i=0 ; i<MAX_CITIES ; i++){
             for(int j=0 ; j<MAX_CITIES ; j++){
@@ -76,7 +79,7 @@ public class ProjectAs20240946 {
 
 
 
-        String[][] deliveryRecord = new String[MAX_RECORDS][13]; 
+        String[][] deliveryRecord = new String[MAX_RECORDS][13];
         for(int i=0 ; i<MAX_RECORDS ; i++){
             for(int j=0 ; j<13 ; j++){
                 deliveryRecord[i][j] = ""; //default null value
@@ -98,18 +101,18 @@ public class ProjectAs20240946 {
          * rater per km =       deliveryRecord[][12]
          * */
 
- 
-    
+        loadCityTable(cityTable);// load data from the txt files
+        loadDeliveryRecord(deliveryRecord);
+        loadDistanceMatrix(distanceMatrix);
+        
+        
         menu(cityTable, distanceMatrix, VEHICLE_TABLE, orderTable, deliveryRecord);
         
         
         input.close();
     }
 public static void menu(String[] cityTable, double[][] distanceMatrix, double[][] vehicleTable,double[] orderTable, String[][] deliveryRecord) {
-    loadCityTable(cityTable);// load data from the txt files
-    loadDeliveryRecord(deliveryRecord);
-    loadDistanceMatrix(distanceMatrix);
-     
+    
     int choice = -1;
 
     while (choice != 0) {
@@ -266,24 +269,27 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
     public static void addCity(String[] cityTable){
         System.out.println();
         System.out.println("What is the name of the city ? ");
-         
+        
         String cityName=input.nextLine();
-        int index = openIndex(cityTable); // method checks for an empty index and returns it
+        int index = openIndex(cityTable); // method checks for an empty index and returns 
+        
         if(index == -1){
             System.out.println("The maximum capacity for the amount of cities have been reached !!!");
               
             return;
         }
         cityTable[index]=cityName.substring(0,1).toUpperCase() + cityName.substring(1).toLowerCase(); //capitalising the first letter
-          
+        System.out.println("City saved successfully!");
         System.out.println();
     }
 
 
-    public static int openIndex(String[] array){
+    public static int openIndex(String[] cityTable){
         int openIndex = 0;
+        
         for (int i = 0; i < 30; i++) {
-            if( array[i] == null || array[i].isEmpty()){
+            if( cityTable[i] == null || cityTable[i].isEmpty()){
+                openIndex = i;
                 return openIndex;
             }
         }
@@ -293,7 +299,7 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
     public static int getCityIndex(String [] cityTable,String cityName){
         int index = -99;
         for(int i = 0; i < MAX_CITIES ; i++){
-            if(cityTable[i]!=null){
+            if(cityTable[i]!=null || !cityTable[i].isEmpty()){
                 if(cityName.equalsIgnoreCase(cityTable[i])) {
                 index = i;
                 }
@@ -316,7 +322,8 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
 
         System.out.println("What do you need to rename the city as ? ");
         String renamedCity = input.nextLine();
-        array[index] = renamedCity.substring(0,1).toUpperCase() + renamedCity.substring(1).toLowerCase(); //capitalising the first letter
+        array[index] = renamedCity.substring(0,1).toUpperCase() + renamedCity.substring(1).toLowerCase(); //capitalising the first 
+        System.out.println("City renamed from \""+city+"\" to \""+array[index]+"\" .");
     }
 
     
@@ -328,7 +335,9 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
         cityTable[index] = null;
         System.out.println("City removed successfully !");
         for(int i = 0 ; i < distanceMatrix[index].length ; i++ ){
-            distanceMatrix[index][i] = -1; //updates the relevent cells with the default value
+            distanceMatrix[index][i] = -1; 
+            distanceMatrix[i][index] = -1;
+            //updates the relevent cells with the default value
         }
           
     }
@@ -397,6 +406,9 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
     
     }
     public static void displayDistanceMatrix(double[][] distanceMatrix, String[] cityTable) {
+        System.out.println( );
+        System.out.println("DISTANCE MATRIX");
+        System.out.println();
         System.out.printf("%-15s", ""); 
         for (int i = 0; i < MAX_CITIES; i++) { //takes the city names from the cityTable and prints them 
             if (cityTable[i] != null && !cityTable[i].isEmpty()) {
@@ -404,7 +416,7 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
             }
         }
         System.out.println();
-        System.out.println("=".repeat(15 * (MAX_CITIES + 1))); // separates the header row 
+        System.out.println("=".repeat(8 * (cityTable.length + 1))); // separates the header row 
         for (int j = 0; j < MAX_CITIES; j++) { 
             if (cityTable[j] == null || cityTable[j].isEmpty()){ 
                 continue;
@@ -443,11 +455,18 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
         System.out.println("What is the source city name ? ");
         String source = input.nextLine();
         int sourceIndex = getCityIndex(citiyTable, source);
+        if (sourceIndex == -99) {
+            System.out.println("Invalid city!! try again.");
+            return;
+        }
 
         System.out.println("What is the destination city name ? ");
         String destination = input.nextLine();
         int destinationIndex = getCityIndex(citiyTable, destination);
-
+        if (destinationIndex == -99) {
+            System.out.println("Invalid city!! try again.");
+            return;
+        }
         if (sourceIndex == destinationIndex) {
             System.out.println("Souce city and Destination city cannot be the same .");
             System.out.println("Invalid input. please try again !!!");
@@ -475,6 +494,7 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
             System.out.println("Max weight -> 1. Van   =  1,000 kg");
             System.out.println("           -> 2. Truck =  5,000 kg");
             System.out.println("           -> 3. Lorry = 10,000 kg");
+            System.out.print("Vehicle choice : ");
             
             while (true) {//checks for the right input type
                 choiceHolder =  input.nextLine();;
@@ -542,7 +562,9 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
             deliveryRecord[openIndex][10] = String.valueOf(profit(orderTable)+TotalOperationCost(orderTable));
             deliveryRecord[openIndex][11] = String.valueOf(estimatedDeliveryTime(orderTable));
             deliveryRecord[openIndex][12] = String.valueOf(orderTable[2]);
-
+            System.out.println();
+            System.out.println("Delivery saved successfully!");
+            System.out.println();
             generateDeliveryReciept(deliveryRecord, openIndex); 
         }
 
@@ -589,9 +611,14 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
         for(int i = 0; i<MAX_CITIES; i++ ){
             for(int j = 0; j<MAX_CITIES; j++){
                 for(int k = 0; k<MAX_CITIES; k++){
-                    double testDistance = distanceMatrix[source][i] + distanceMatrix[i][j] + distanceMatrix[j][k]+distanceMatrix[k][destination];
-                    if(minimumDistance > testDistance){
-                        minimumDistance = testDistance;
+                    if ( distanceMatrix[source][i] > 0 && distanceMatrix[i][j] > 0 && distanceMatrix[j][k]>0 
+                    && distanceMatrix[k][destination]> 0) {
+                        
+                    
+                        double testDistance = distanceMatrix[source][i] + distanceMatrix[i][j] + distanceMatrix[j][k]+distanceMatrix[k][destination];
+                        if(minimumDistance > testDistance){
+                            minimumDistance = testDistance;
+                        }
                     }
                 }
             }
@@ -715,9 +742,9 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
             FileWriter writer = new FileWriter("Delivery Record.txt");
             for(int i = 0; i < deliveryRecord.length ; i++){
                 for(int j = 0; j < deliveryRecord[i].length ; j++){
-                    writer.write(String.format("%-20s",deliveryRecord[i][j]));
+                    writer.write(String.format("%-15s",deliveryRecord[i][j]));
                     if(j < deliveryRecord[i].length - 1){
-                        writer.write("\t");
+                        writer.write(" ");
                     }
                 }
                 writer.write("\n");
@@ -738,13 +765,13 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
             BufferedReader reader = new BufferedReader(new FileReader("City Table.txt"));
 
             String city;
-            for(int i =0 ; i < MAX_CITIES; i++){
+            for(int i =0 ;  i < MAX_CITIES; i++){
                 city = reader.readLine();
                 if(city != null){
                     cityTable[i] = city.trim();
                 }
                 else{
-                    cityTable[i] = null;
+                    cityTable[i] = "";
                 }
             }
             reader.close();
@@ -762,8 +789,8 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
             for(int i = 0; i < MAX_CITIES ; i++){
                 line = reader.readLine();
                 if(line != null){
-                    String[] distance = line.trim().split("\\t+");
-                    for(int j=0; j<MAX_CITIES ; j++){
+                    String[] distance = line.trim().split("\\s+");
+                    for(int j=0; j< MAX_CITIES && j<distance.length ; j++){
                         distanceMatrix[i][j]=Double.parseDouble(distance[j]);
 
                     }
@@ -784,11 +811,12 @@ public static void menu(String[] cityTable, double[][] distanceMatrix, double[][
             BufferedReader reader = new BufferedReader(new FileReader("Delivery Record.txt"));
             String line;
 
-            for(int i = 0; i < MAX_RECORDS  ; i++){
+            for(int i = 0; i < MAX_RECORDS   ; i++){
                 line = reader.readLine();
                 if(line != null){
-                    String[] delivery = line.trim().split("\\t+");
-                    for(int j=0; j<13 ; j++){
+                    String[] delivery = line.trim().split("\\s+");
+                    for(int j=0;j < delivery.length && j<13  ; j++){
+                        
                         deliveryRecord[i][j]=delivery[j];
 
                     }
